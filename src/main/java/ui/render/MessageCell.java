@@ -74,7 +74,15 @@ public class MessageCell extends ListCell<Message> {
             try {
                 imageView.setImage(new Image(new FileInputStream(msg.getContenu()), 280, 0, true, false));
             } catch (Exception e) { imageView.setImage(null); }
-            fileBox.getChildren().addAll(fileNameLabel, imageView);
+            Button openDirBtn = mkFileBtn("\uD83D\uDCC2 Dossier", e -> {
+                try { java.awt.Desktop.getDesktop().open(new java.io.File(msg.getContenu()).getParentFile()); }
+                catch (Exception ex) {}
+            });
+            Button openFileBtn = mkFileBtn("\uD83D\uDCC1 Ouvrir", e -> {
+                try { java.awt.Desktop.getDesktop().open(new java.io.File(msg.getContenu())); }
+                catch (Exception ex) {}
+            });
+            fileBox.getChildren().addAll(fileNameLabel, imageView, new HBox(8, openFileBtn, openDirBtn));
             setGraphic(fileBox); return;
         }
 
@@ -84,7 +92,16 @@ public class MessageCell extends ListCell<Message> {
             String[] parts = extra != null ? extra.split("\\|", 2) : new String[]{msg.getContenu(), "fichier"};
             fileNameLabel.setText("\uD83D\uDCC4  " + (parts.length > 1 ? parts[1] : "fichier"));
             textPreview.setText(msg.getContenu());
-            fileBox.getChildren().addAll(fileNameLabel, textPreview);
+            String filePath = parts.length > 1 ? parts[0] : "";
+            Button openDirBtn = mkFileBtn("\uD83D\uDCC2 Dossier", e -> {
+                try { java.awt.Desktop.getDesktop().open(new java.io.File(filePath).getParentFile()); }
+                catch (Exception ex) {}
+            });
+            Button openFileBtn = mkFileBtn("\uD83D\uDCC1 Ouvrir", e -> {
+                try { java.awt.Desktop.getDesktop().open(new java.io.File(filePath)); }
+                catch (Exception ex) {}
+            });
+            fileBox.getChildren().addAll(fileNameLabel, textPreview, new HBox(8, openFileBtn, openDirBtn));
             setGraphic(fileBox); return;
         }
 

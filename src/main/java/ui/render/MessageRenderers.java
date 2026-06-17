@@ -14,12 +14,13 @@ public final class MessageRenderers {
     public static void renderImage(ListCell<Message> cell, FileDisplayNodes n, Message msg) {
         n.fileBox.getChildren().clear();
         n.fileNameLabel.setText("\uD83D\uDDBC  " + (msg.getExtra() != null ? msg.getExtra() : "Image"));
+        n.setFilePath(msg.getContenu());
         try (FileInputStream fis = new FileInputStream(msg.getContenu())) {
             n.imageView.setImage(new Image(fis, 280, 0, true, false));
         } catch (Exception e) {
             n.imageView.setImage(null);
         }
-        n.fileBox.getChildren().addAll(n.fileNameLabel, n.imageView);
+        n.fileBox.getChildren().addAll(n.fileNameLabel, n.imageView, n.fileBtnBox);
         cell.setGraphic(n.fileBox);
     }
 
@@ -29,7 +30,11 @@ public final class MessageRenderers {
         String[] parts = extra != null ? extra.split("\\|", 2) : new String[]{msg.getContenu(), "fichier"};
         n.fileNameLabel.setText("\uD83D\uDCC4  " + (parts.length > 1 ? parts[1] : "fichier"));
         n.textPrev.setText(msg.getContenu());
-        n.fileBox.getChildren().addAll(n.fileNameLabel, n.textPrev);
+        if (parts.length > 1) {
+            String path = parts[0];
+            n.setFilePath(path);
+        }
+        n.fileBox.getChildren().addAll(n.fileNameLabel, n.textPrev, n.fileBtnBox);
         cell.setGraphic(n.fileBox);
     }
 

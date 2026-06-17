@@ -62,18 +62,41 @@ public class ChatApp extends Application {
 
     private void loadApplicationIcon(Stage stage) {
         try {
-            // Essayer d'abord icon.png, puis icon.ico
-            InputStream iconStream = getClass().getResourceAsStream("/icon.png");
+            // Essayer dans l'ordre : SVG, PNG, ICO
+            InputStream iconStream = getClass().getResourceAsStream("/icon.svg");
+            String format = "svg";
+            
+            if (iconStream == null) {
+                iconStream = getClass().getResourceAsStream("/icon.png");
+                format = "png";
+            }
             if (iconStream == null) {
                 iconStream = getClass().getResourceAsStream("/icon.ico");
+                format = "ico";
             }
             
             if (iconStream != null) {
-                Image icon = new Image(iconStream);
-                stage.getIcons().add(icon);
-                LOGGER.info("Application icon loaded successfully");
+                // JavaFX ne supporte pas nativement SVG via Image()
+                // SVG nécessite une conversion préalable en PNG ou une bibliothèque tierce
+                if ("svg".equals(format)) {
+                    LOGGER.warning("SVG format detected. JavaFX has limited SVG support for window icons. " +
+                                 "Consider converting to PNG for better compatibility.");
+                    // Essayer quand même de charger le SVG
+                    try {
+                        Image icon = new Image(iconStream);
+                        stage.getIcons().add(icon);
+                        LOGGER.info("Application icon loaded from SVG (may have limited support)");
+                    } catch (Exception e) {
+                        LOGGER.warning("Failed to load SVG icon: " + e.getMessage() + 
+                                     ". Please convert icon.svg to icon.png");
+                    }
+                } else {
+                    Image icon = new Image(iconStream);
+                    stage.getIcons().add(icon);
+                    LOGGER.info("Application icon loaded successfully from " + format);
+                }
             } else {
-                LOGGER.warning("Icon file not found in resources (tried icon.png and icon.ico)");
+                LOGGER.warning("Icon file not found in resources (tried icon.svg, icon.png, and icon.ico)");
             }
         } catch (Exception e) {
             LOGGER.warning("Failed to load application icon: " + e.getMessage());
@@ -143,13 +166,38 @@ public class ChatApp extends Application {
 
         // Ajouter l'icône centrée au-dessus du titre
         try {
-            InputStream iconStream = getClass().getResourceAsStream("/icon.png");
+            InputStream iconStream = getClass().getResourceAsStream("/icon.svg");
+            String format = "svg";
+            
+            if (iconStream == null) {
+                iconStream = getClass().getResourceAsStream("/icon.png");
+                format = "png";
+            }
             if (iconStream == null) {
                 iconStream = getClass().getResourceAsStream("/icon.ico");
+                format = "ico";
             }
             
             if (iconStream != null) {
-                ImageView iconView = new ImageView(new Image(iconStream));
+                ImageView iconView = new ImageView();
+                
+                if ("svg".equals(format)) {
+                    // SVG a un support limité dans JavaFX pour ImageView
+                    try {
+                        Image icon = new Image(iconStream);
+                        iconView.setImage(icon);
+                    } catch (Exception e) {
+                        LOGGER.warning("Failed to load SVG for login dialog: " + e.getMessage());
+                        // Fallback vers PNG si SVG échoue
+                        InputStream pngStream = getClass().getResourceAsStream("/icon.png");
+                        if (pngStream != null) {
+                            iconView.setImage(new Image(pngStream));
+                        }
+                    }
+                } else {
+                    iconView.setImage(new Image(iconStream));
+                }
+                
                 iconView.setFitWidth(64);
                 iconView.setFitHeight(64);
                 iconView.setPreserveRatio(true);

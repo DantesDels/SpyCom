@@ -1,0 +1,44 @@
+plugins {
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+javafx {
+    version = '17.0.2'
+    modules = ['javafx.controls']
+}
+
+application {
+    mainClass = 'Main'
+}
+
+run {
+    if (project.hasProperty('args')) {
+        args project.property('args').split()
+    }
+}
+
+task runServer(type: JavaExec) {
+    group 'application'
+    description 'Demarrer le serveur de chat'
+    mainClass = application.mainClass
+    classpath = sourceSets.main.runtimeClasspath
+    args 'server'
+}
+
+task runClient(type: JavaExec) {
+    group 'application'
+    description 'Demarrer un client de chat'
+    mainClass = application.mainClass
+    classpath = sourceSets.main.runtimeClasspath
+    args 'localhost', '5000'
+}

@@ -1,0 +1,12 @@
+.gradle/
+build/
+bin/
+target/
+*.class
+*.jar
+*.log
+*.err
+server_files/
+.idea/
+*.iml
+.vscode/

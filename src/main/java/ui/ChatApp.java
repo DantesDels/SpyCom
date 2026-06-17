@@ -66,7 +66,7 @@ public class ChatApp extends Application {
             InputStream iconStream = null;
             String loadedFormat = null;
             for (String fmt : formats) {
-                iconStream = getClass().getResourceAsStream("/favicon." + fmt);
+                iconStream = getClass().getResourceAsStream(ICON_FAVICON_PATH + "." + fmt);
                 if (iconStream != null) {
                     loadedFormat = fmt;
                     break;
@@ -150,7 +150,7 @@ public class ChatApp extends Application {
             InputStream iconStream = null;
             String loadedFormat = null;
             for (String fmt : formats) {
-                iconStream = getClass().getResourceAsStream("/mainIcon." + fmt);
+                iconStream = getClass().getResourceAsStream(ICON_MAIN_PATH + "." + fmt);
                 if (iconStream != null) {
                     loadedFormat = fmt;
                     break;

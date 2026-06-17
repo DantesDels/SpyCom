@@ -46,9 +46,17 @@ public final class Theme {
     public static final double SZ_LARGE   = 14;
 
     // ═══════════════════════════════════════════
+    //  ICON PATHS (base name, extension-free)
+    //  Change these to swap icons without touching code.
+    // ═══════════════════════════════════════════
+    public static final String ICON_MAIN_PATH = "/mainIcon";
+    public static final String ICON_FAVICON_PATH = "/favicon";
+    public static final String ICON_EXE_PATH = "/icon";
+
+    // ═══════════════════════════════════════════
     //  ICON SIZES
     // ═══════════════════════════════════════════
-    public static final double ICON_LOGIN_SIZE = 80;
+    public static final double ICON_LOGIN_SIZE = 120;
     public static final double ICON_FAVICON_SIZE = 32;
     public static final double ICON_EXE_SIZE = 256;
 

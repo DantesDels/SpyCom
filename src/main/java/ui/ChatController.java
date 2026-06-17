@@ -2,6 +2,7 @@ package ui;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Logger;
 
 import client.ChatClient;
 import javafx.application.Platform;
@@ -14,6 +15,8 @@ import ui.net.FileReceiver;
 import ui.net.UserRoomManager;
 
 public class ChatController {
+    private static final Logger LOGGER = Logger.getLogger(ChatController.class.getName());
+    
     private final ChatClient client;
     private final ChatView view;
 
@@ -25,8 +28,10 @@ public class ChatController {
     private final InputBinder inputBinder;
     private final FileReceiver fileReceiver;
     private final UserRoomManager userRoom;
+    private Runnable pseudoTakenCallback;
 
     public ChatController(ChatView v, ChatClient c) {
+        LOGGER.info("ChatController constructor");
         this.client = c;
         this.view = v;
 
@@ -43,20 +48,37 @@ public class ChatController {
         inputBinder = new InputBinder(client, v, messages, commands);
 
         client.setCallback(this::onMsg);
+        LOGGER.info("ChatController initialized");
+    }
+
+    public void setPseudoTakenCallback(Runnable cb) { 
+        LOGGER.info("setPseudoTakenCallback() called");
+        this.pseudoTakenCallback = cb; 
     }
 
     public void connect() {
-        try { client.connect(); Platform.runLater(() -> view.setConnected(true)); }
+        LOGGER.info("ChatController.connect() called");
+        try { 
+            client.connect(); 
+            LOGGER.info("Client connected successfully");
+            Platform.runLater(() -> view.setConnected(true)); 
+        }
         catch (IOException e) {
+            LOGGER.severe("Connection failed: " + e.getMessage());
             Platform.runLater(() -> messages.add(
                 new Message(MessageType.SERVER_INFO, null, "Erreur: " + e.getMessage(), System.currentTimeMillis())));
         }
     }
 
-    public void disconnect() { client.disconnect(); Platform.runLater(() -> view.setConnected(false)); }
+    public void disconnect() { 
+        LOGGER.info("ChatController.disconnect() called");
+        client.disconnect(); 
+        Platform.runLater(() -> view.setConnected(false)); 
+    }
     public List<String> getCommands() { return commands.getCommands(); }
 
     private void onMsg(Message m) {
+        LOGGER.info("Message received: type=" + m.getType() + ", pseudo=" + m.getPseudo());
         Platform.runLater(() -> {
             switch (m.getType()) {
                 case TEXT, SERVER_INFO, HISTORY,
@@ -77,7 +99,17 @@ public class ChatController {
                     }
                 }
 
-                case PSEUDO_TAKEN -> { messages.add(m); view.setConnected(false); }
+                case PSEUDO_TAKEN -> {
+                    LOGGER.warning("PSEUDO_TAKEN message received: " + m.getContenu());
+                    messages.add(m);
+                    view.setConnected(false);
+                    if (pseudoTakenCallback != null) {
+                        LOGGER.info("Calling pseudoTakenCallback");
+                        pseudoTakenCallback.run();
+                    } else {
+                        LOGGER.warning("pseudoTakenCallback is null!");
+                    }
+                }
                 default -> {}
             }
         });

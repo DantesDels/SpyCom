@@ -28,56 +28,43 @@ L'installateur inclut :
 - Création de raccourcis sur le bureau
 - Ajout au menu Démarrer
 
-## Ajouter une icône personnalisée
+## Icônes et tailles (Theme.java)
 
-### Pour l'application JavaFX (icône de fenêtre)
+Les tailles sont centralisées dans `src/main/java/ui/Theme.java` :
 
-1. **Préparer l'icône**
-   - Format : PNG (recommandé)
-   - Taille : 32x32, 64x64, ou 128x128 pixels
-   - Transparence : supportée
+| Constante           | Valeur | Usage |
+|---------------------|--------|-------|
+| `ICON_LOGIN_SIZE`   | 80     | `mainIcon.*` — page de connexion |
+| `ICON_FAVICON_SIZE` | 32     | `favicon.*` — barre de titre / tâche |
+| `ICON_EXE_SIZE`     | 256    | `icon.*` — exécutable Windows .exe |
 
-2. **Placer le fichier**
-   - Nommer le fichier `icon.png`
-   - Le placer dans `src/main/resources/`
+## Formats par usage
 
-3. **Vérifier**
-   - L'icône sera chargée automatiquement au démarrage
-   - Elle apparaîtra dans la barre de titre et la barre des tâches
+| Usage                  | Fichier cible      | Format prioritaire | Raison                              |
+|------------------------|--------------------|--------------------|--------------------------------------|
+| Login dialog (JavaFX)  | `mainIcon.*`       | PNG > SVG > ICO    | JavaFX `ImageView` supporte PNG     |
+| Window icon (JavaFX)   | `favicon.*`        | PNG > SVG > ICO    | JavaFX `Stage.getIcons()` préfère PNG |
+| .exe icon (jpackage)   | `icon.*`           | ICO uniquement      | `jpackage --icon` sur Windows nécessite .ico |
 
-### Pour l'exécutable Windows (icône du fichier .exe)
-
-1. **Préparer l'icône**
-   - Format : ICO (obligatoire pour Windows)
-   - Taille : 256x256 pixels (contient plusieurs tailles)
-   - Outils de conversion :
-     - [ConvertICO](https://convertico.com/)
-     - [ICO Convert](https://icoconvert.com/)
-     - GIMP : exporter en .ico
-
-2. **Placer le fichier**
-   - Nommer le fichier `icon.ico`
-   - Le placer dans `src/main/resources/`
-
-3. **Générer l'exécutable**
-   ```bash
-   gradle createExe
-   ```
-   - L'icône sera automatiquement intégrée à l'exécutable
-
-### Icônes recommandées
-
-Pour un résultat professionnel, préparez :
-- `icon.png` : 64x64 pixels (pour JavaFX)
-- `icon.ico` : 256x256 pixels avec plusieurs tailles intégrées (pour Windows)
+Placez les fichiers dans `src/main/resources/` avec les noms exacts ci-dessus.
 
 ## Structure des ressources
 
 ```
 src/main/resources/
-├── icon.png    # Icône de l'application JavaFX
-└── icon.ico    # Icône de l'exécutable Windows
+├── mainIcon.png / .svg / .ico   # Icône du login (80×80)
+├── favicon.png / .svg / .ico    # Icône de fenêtre (32×32)
+└── icon.png / .svg / .ico       # Icône de l'exécutable (256×256)
 ```
+
+## Générer l'exécutable
+
+```bash
+gradle jar
+gradle createExe
+```
+
+L'icône `icon.ico` est intégrée automatiquement par jpackage.
 
 ## Dépannage
 

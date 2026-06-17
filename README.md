@@ -450,6 +450,17 @@ Le thème est entièrement configurable dans `src/main/java/ui/Theme.java` :
 | `PRIVATE` | Rose | Messages privés |
 | `BORDER` | Bleu-gris | Toutes les bordures |
 
+### Tailles des icônes (Theme.java)
+
+| Constante           | Valeur | Usage |
+|---------------------|--------|-------|
+| `ICON_LOGIN_SIZE`   | 80     | `mainIcon.*` affiché dans la popup de connexion |
+| `ICON_FAVICON_SIZE` | 32     | `favicon.*` dans la barre de titre / tâche |
+| `ICON_EXE_SIZE`     | 256    | `icon.*` pour l'exécutable Windows .exe |
+
+Les fichiers sources (PNG, SVG, ICO) se trouvent dans `src/main/resources/`.  
+Le format le plus adapté est choisi automatiquement à l'exécution : **PNG** pour JavaFX (meilleur support), **ICO** pour `jpackage` (obligatoire Windows).
+
 ---
 
 ## Commandes disponibles

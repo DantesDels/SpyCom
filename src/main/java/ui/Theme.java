@@ -46,6 +46,13 @@ public final class Theme {
     public static final double SZ_LARGE   = 14;
 
     // ═══════════════════════════════════════════
+    //  ICON SIZES
+    // ═══════════════════════════════════════════
+    public static final double ICON_LOGIN_SIZE = 80;
+    public static final double ICON_FAVICON_SIZE = 32;
+    public static final double ICON_EXE_SIZE = 256;
+
+    // ═══════════════════════════════════════════
     //  SHORTCUTS — chainable helpers
     // ═══════════════════════════════════════════
 

@@ -2,43 +2,35 @@
 
 Ce dossier contient les icônes de l'application.
 
-## Formats supportés
+## Tailles définies dans Theme.java
 
-L'application essaie de charger les icônes dans l'ordre suivant :
+Les tailles des icônes sont centralisées dans `Theme.java` :
 
-1. **icon.svg** (SVG) - Format vectoriel, support limité dans JavaFX
-2. **icon.png** (PNG) - Format recommandé, support complet
-3. **icon.ico** (ICO) - Format Windows, support complet
+| Constante           | Valeur | Usage |
+|---------------------|--------|-------|
+| `ICON_LOGIN_SIZE`   | 80     | `mainIcon.*` — page login |
+| `ICON_FAVICON_SIZE` | 32     | `favicon.*` — barre de titre |
+| `ICON_EXE_SIZE`     | 256    | `icon.*` — exécutable .exe |
 
-### Limitations du format SVG
+Modifiez ces constantes dans `Theme.java` pour redimensionner les icônes.
 
-JavaFX a un support limité pour les fichiers SVG :
-- Les icônes de fenêtre (title bar) ne supportent pas nativement SVG
-- L'affichage dans la boîte de dialogue de login peut avoir des limitations
-- Pour de meilleurs résultats, utilisez PNG (64x64 ou 128x128 pixels)
+## Formats par usage
 
-Si vous avez un fichier SVG, nous recommandons de le convertir en PNG pour une compatibilité optimale.
+| Usage                  | Priorité de chargement | Raison                              |
+|------------------------|------------------------|--------------------------------------|
+| Login dialog (JavaFX)  | PNG → SVG → ICO        | JavaFX `ImageView` supporte PNG     |
+| Window icon (JavaFX)   | PNG → SVG → ICO        | JavaFX `Stage.getIcons()` préfère PNG |
+| .exe icon (jpackage)   | ICO uniquement         | `jpackage --icon` sur Windows nécessite .ico |
 
-## Fichiers requis
+## Fichiers disponibles
 
-### icon.png (recommandé)
-- **Usage** : Icône de la fenêtre JavaFX et de la boîte de dialogue de login
-- **Format** : PNG avec transparence
-- **Taille recommandée** : 64x64 ou 128x128 pixels
-- **Placement** : Ce fichier doit être nommé exactement `icon.png`
+Chaque icône existe en 3 formats :
 
-### icon.ico
-- **Usage** : Icône de l'exécutable Windows
-- **Format** : ICO (Windows Icon)
-- **Taille recommandée** : 256x256 pixels (avec plusieurs tailles intégrées)
-- **Placement** : Ce fichier doit être nommé exactement `icon.ico`
-
-### icon.svg (optionnel)
-- **Usage** : Format vectoriel alternatif
-- **Format** : SVG (Scalable Vector Graphics)
-- **Taille** : Vectoriel (redimensionnable sans perte)
-- **Placement** : Ce fichier doit être nommé exactement `icon.svg`
-- **Note** : Support limité dans JavaFX, conversion en PNG recommandée
+| Fichier          | Usage principal                      |
+|------------------|--------------------------------------|
+| `mainIcon.*`     | Affichée dans le dialogue de connexion (80×80) |
+| `favicon.*`      | Icône de la fenêtre (barre de titre, 32×32) |
+| `icon.*`         | Icône de l'exécutable Windows (.exe, 256×256) |
 
 ## Comment créer les icônes
 
@@ -88,14 +80,14 @@ Après avoir placé les icônes :
    ```bash
    gradle runClient
    ```
-   L'icône devrait apparaître dans la barre de titre et dans la boîte de dialogue de login.
+   L'icône `favicon.svg` (32x32) apparaît dans la barre de titre, `mainIcon.svg` (80x80) dans le login.
 
 2. **Pour l'exécutable** :
    ```bash
    gradle jar
    gradle createExe
    ```
-   L'icône devrait apparaître sur le fichier .exe généré.
+   L'icône `icon.svg` (256x256) est utilisée pour le fichier .exe.
 
 ## Icône par défaut
 
@@ -103,11 +95,3 @@ Si aucune icône n'est présente :
 - JavaFX utilisera l'icône par défaut du système
 - L'exécutable utilisera l'icône Java par défaut
 - L'application fonctionnera normalement
-
-## Ressources utiles
-
-- [Icônes gratuites](https://www.flaticon.com/)
-- [IconFinder](https://www.iconfinder.com/)
-- [The Noun Project](https://thenounproject.com/)
-
-Recherchez des icônes avec les mots-clés : "chat", "message", "secure", "communication"

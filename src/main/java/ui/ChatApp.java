@@ -62,41 +62,22 @@ public class ChatApp extends Application {
 
     private void loadApplicationIcon(Stage stage) {
         try {
-            // Essayer dans l'ordre : SVG, PNG, ICO
-            InputStream iconStream = getClass().getResourceAsStream("/icon.svg");
-            String format = "svg";
-            
-            if (iconStream == null) {
-                iconStream = getClass().getResourceAsStream("/icon.png");
-                format = "png";
-            }
-            if (iconStream == null) {
-                iconStream = getClass().getResourceAsStream("/icon.ico");
-                format = "ico";
-            }
-            
-            if (iconStream != null) {
-                // JavaFX ne supporte pas nativement SVG via Image()
-                // SVG nécessite une conversion préalable en PNG ou une bibliothèque tierce
-                if ("svg".equals(format)) {
-                    LOGGER.warning("SVG format detected. JavaFX has limited SVG support for window icons. " +
-                                 "Consider converting to PNG for better compatibility.");
-                    // Essayer quand même de charger le SVG
-                    try {
-                        Image icon = new Image(iconStream);
-                        stage.getIcons().add(icon);
-                        LOGGER.info("Application icon loaded from SVG (may have limited support)");
-                    } catch (Exception e) {
-                        LOGGER.warning("Failed to load SVG icon: " + e.getMessage() + 
-                                     ". Please convert icon.svg to icon.png");
-                    }
-                } else {
-                    Image icon = new Image(iconStream);
-                    stage.getIcons().add(icon);
-                    LOGGER.info("Application icon loaded successfully from " + format);
+            String[] formats = { "png", "svg", "ico" };
+            InputStream iconStream = null;
+            String loadedFormat = null;
+            for (String fmt : formats) {
+                iconStream = getClass().getResourceAsStream("/favicon." + fmt);
+                if (iconStream != null) {
+                    loadedFormat = fmt;
+                    break;
                 }
+            }
+            if (iconStream != null) {
+                Image icon = new Image(iconStream, ICON_FAVICON_SIZE, ICON_FAVICON_SIZE, true, true);
+                stage.getIcons().add(icon);
+                LOGGER.info("Favicon loaded (" + loadedFormat + ") " + (int)ICON_FAVICON_SIZE + "x" + (int)ICON_FAVICON_SIZE);
             } else {
-                LOGGER.warning("Icon file not found in resources (tried icon.svg, icon.png, and icon.ico)");
+                LOGGER.warning("No favicon found (tried png, svg, ico)");
             }
         } catch (Exception e) {
             LOGGER.warning("Failed to load application icon: " + e.getMessage());
@@ -164,46 +145,28 @@ public class ChatApp extends Application {
         layout.setAlignment(Pos.CENTER_LEFT);
         layout.setStyle(bg(BG_PANEL) + border(BORDER, "2"));
 
-        // Ajouter l'icône centrée au-dessus du titre
         try {
-            InputStream iconStream = getClass().getResourceAsStream("/icon.svg");
-            String format = "svg";
-            
-            if (iconStream == null) {
-                iconStream = getClass().getResourceAsStream("/icon.png");
-                format = "png";
-            }
-            if (iconStream == null) {
-                iconStream = getClass().getResourceAsStream("/icon.ico");
-                format = "ico";
-            }
-            
-            if (iconStream != null) {
-                ImageView iconView = new ImageView();
-                
-                if ("svg".equals(format)) {
-                    // SVG a un support limité dans JavaFX pour ImageView
-                    try {
-                        Image icon = new Image(iconStream);
-                        iconView.setImage(icon);
-                    } catch (Exception e) {
-                        LOGGER.warning("Failed to load SVG for login dialog: " + e.getMessage());
-                        // Fallback vers PNG si SVG échoue
-                        InputStream pngStream = getClass().getResourceAsStream("/icon.png");
-                        if (pngStream != null) {
-                            iconView.setImage(new Image(pngStream));
-                        }
-                    }
-                } else {
-                    iconView.setImage(new Image(iconStream));
+            String[] formats = { "png", "svg", "ico" };
+            InputStream iconStream = null;
+            String loadedFormat = null;
+            for (String fmt : formats) {
+                iconStream = getClass().getResourceAsStream("/mainIcon." + fmt);
+                if (iconStream != null) {
+                    loadedFormat = fmt;
+                    break;
                 }
-                
-                iconView.setFitWidth(64);
-                iconView.setFitHeight(64);
+            }
+            if (iconStream != null) {
+                ImageView iconView = new ImageView(new Image(iconStream));
+                iconView.setFitWidth(ICON_LOGIN_SIZE);
+                iconView.setFitHeight(ICON_LOGIN_SIZE);
                 iconView.setPreserveRatio(true);
                 HBox iconContainer = new HBox(iconView);
                 iconContainer.setAlignment(Pos.CENTER);
-                layout.getChildren().add(iconContainer);
+                layout.getChildren().add(0, iconContainer);
+                LOGGER.info("Login icon loaded (" + loadedFormat + ") " + (int)ICON_LOGIN_SIZE + "x" + (int)ICON_LOGIN_SIZE);
+            } else {
+                LOGGER.warning("No mainIcon found (tried png, svg, ico)");
             }
         } catch (Exception e) {
             LOGGER.warning("Failed to load icon for login dialog: " + e.getMessage());
@@ -213,7 +176,6 @@ public class ChatApp extends Application {
         title.setStyle(fg(ACCENT, FONT_STACK, SZ_LARGE) + "-fx-font-weight: bold;");
         HBox titleContainer = new HBox(title);
         titleContainer.setAlignment(Pos.CENTER);
-        layout.getChildren().add(titleContainer);
 
         if (errorMsg != null) {
             Label errorLabel = new Label(errorMsg);
@@ -284,7 +246,7 @@ public class ChatApp extends Application {
         btnRow.setAlignment(Pos.CENTER_RIGHT);
 
         layout.getChildren().addAll(
-            title,
+            titleContainer,
             hostLabel, hostRow,
             portLabel, portField,
             pseudoLabel, pseudoField,

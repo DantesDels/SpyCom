@@ -42,3 +42,40 @@ task runClient(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     args 'localhost', '5000'
 }
+
+task createExe(type: Exec) {
+    group 'distribution'
+    description 'Creer un executable Windows avec jpackage'
+    
+    dependsOn 'jar'
+    
+    def javaHome = System.getProperty('java.home')
+    def jpackagePath = "$javaHome/bin/jpackage"
+    def jarFile = file("$buildDir/libs/${project.name}.jar")
+    def iconFile = file("$projectDir/src/main/resources/icon.ico")
+    
+    commandLine jpackagePath,
+        '--type', 'exe',
+        '--name', 'SpyCom',
+        '--input', "$buildDir/libs",
+        '--main-jar', "${project.name}.jar",
+        '--main-class', 'Main',
+        '--dest', "$buildDir/dist",
+        '--app-version', '1.0.0',
+        '--vendor', 'SpyCom',
+        '--description', 'Application de chat securisee',
+        '--win-dir-chooser',
+        '--win-shortcut',
+        '--win-menu'
+    
+    if (iconFile.exists()) {
+        args '--icon', iconFile.absolutePath
+    }
+    
+    doFirst {
+        file("$buildDir/dist").mkdirs()
+        if (!jarFile.exists()) {
+            throw new GradleException("JAR file not found: $jarFile. Run 'gradle jar' first.")
+        }
+    }
+}

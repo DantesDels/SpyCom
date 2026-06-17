@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -18,6 +19,7 @@ import javafx.stage.StageStyle;
 import static ui.Theme.*;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,6 +49,20 @@ public class ChatApp extends Application {
         setupLogger();
         LOGGER.info("=== ChatApp.start() ===");
         this.primaryStage = primaryStage;
+        
+        // Charger l'icône de l'application
+        try {
+            InputStream iconStream = getClass().getResourceAsStream("/icon.png");
+            if (iconStream != null) {
+                primaryStage.getIcons().add(new Image(iconStream));
+                LOGGER.info("Application icon loaded successfully");
+            } else {
+                LOGGER.warning("Icon file not found in resources");
+            }
+        } catch (Exception e) {
+            LOGGER.warning("Failed to load application icon: " + e.getMessage());
+        }
+        
         loadPrefs();
         LOGGER.info("Prefs loaded: host=" + host + ", port=" + port);
 

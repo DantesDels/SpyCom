@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -51,22 +52,32 @@ public class ChatApp extends Application {
         this.primaryStage = primaryStage;
         
         // Charger l'icône de l'application
-        try {
-            InputStream iconStream = getClass().getResourceAsStream("/icon.png");
-            if (iconStream != null) {
-                primaryStage.getIcons().add(new Image(iconStream));
-                LOGGER.info("Application icon loaded successfully");
-            } else {
-                LOGGER.warning("Icon file not found in resources");
-            }
-        } catch (Exception e) {
-            LOGGER.warning("Failed to load application icon: " + e.getMessage());
-        }
+        loadApplicationIcon(primaryStage);
         
         loadPrefs();
         LOGGER.info("Prefs loaded: host=" + host + ", port=" + port);
 
         showLoginAndConnect(null);
+    }
+
+    private void loadApplicationIcon(Stage stage) {
+        try {
+            // Essayer d'abord icon.png, puis icon.ico
+            InputStream iconStream = getClass().getResourceAsStream("/icon.png");
+            if (iconStream == null) {
+                iconStream = getClass().getResourceAsStream("/icon.ico");
+            }
+            
+            if (iconStream != null) {
+                Image icon = new Image(iconStream);
+                stage.getIcons().add(icon);
+                LOGGER.info("Application icon loaded successfully");
+            } else {
+                LOGGER.warning("Icon file not found in resources (tried icon.png and icon.ico)");
+            }
+        } catch (Exception e) {
+            LOGGER.warning("Failed to load application icon: " + e.getMessage());
+        }
     }
 
     private void showLoginAndConnect(String errorMsg) {
@@ -121,14 +132,40 @@ public class ChatApp extends Application {
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.initStyle(StageStyle.UNDECORATED);
         dialog.setTitle("Connexion");
+        
+        // Charger l'icône pour la boîte de dialogue
+        loadApplicationIcon(dialog);
 
         VBox layout = new VBox(10);
         layout.setPadding(new Insets(20));
         layout.setAlignment(Pos.CENTER_LEFT);
         layout.setStyle(bg(BG_PANEL) + border(BORDER, "2"));
 
+        // Ajouter l'icône centrée au-dessus du titre
+        try {
+            InputStream iconStream = getClass().getResourceAsStream("/icon.png");
+            if (iconStream == null) {
+                iconStream = getClass().getResourceAsStream("/icon.ico");
+            }
+            
+            if (iconStream != null) {
+                ImageView iconView = new ImageView(new Image(iconStream));
+                iconView.setFitWidth(64);
+                iconView.setFitHeight(64);
+                iconView.setPreserveRatio(true);
+                HBox iconContainer = new HBox(iconView);
+                iconContainer.setAlignment(Pos.CENTER);
+                layout.getChildren().add(iconContainer);
+            }
+        } catch (Exception e) {
+            LOGGER.warning("Failed to load icon for login dialog: " + e.getMessage());
+        }
+
         Label title = new Label("CONNEXION AU SERVEUR");
         title.setStyle(fg(ACCENT, FONT_STACK, SZ_LARGE) + "-fx-font-weight: bold;");
+        HBox titleContainer = new HBox(title);
+        titleContainer.setAlignment(Pos.CENTER);
+        layout.getChildren().add(titleContainer);
 
         if (errorMsg != null) {
             Label errorLabel = new Label(errorMsg);
@@ -206,7 +243,7 @@ public class ChatApp extends Application {
             btnRow
         );
 
-        Scene scene = new Scene(layout, 450, errorMsg != null ? 380 : 350);
+        Scene scene = new Scene(layout, 450, errorMsg != null ? 460 : 430);
         dialog.setScene(scene);
         dialog.setAlwaysOnTop(true);
         LOGGER.info("Showing login dialog");

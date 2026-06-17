@@ -240,8 +240,10 @@ public class ChatApp extends Application {
             StringBuilder sb = new StringBuilder();
             try {
                 LOGGER.info("Executing ipconfig command");
-                Process p = Runtime.getRuntime().exec("ipconfig");
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+                ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "ipconfig");
+                pb.redirectErrorStream(true);
+                Process p = pb.start();
+                try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream(), "cp850"))) {
                     String line;
                     while ((line = br.readLine()) != null) {
                         sb.append(line).append("\n");
